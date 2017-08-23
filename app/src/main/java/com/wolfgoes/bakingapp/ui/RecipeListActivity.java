@@ -1,32 +1,47 @@
 package com.wolfgoes.bakingapp.ui;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.wolfgoes.bakingapp.R;
+import com.wolfgoes.bakingapp.adapter.RecipeAdapter;
 import com.wolfgoes.bakingapp.model.Recipe;
 import com.wolfgoes.bakingapp.network.Controller;
 import com.wolfgoes.bakingapp.network.api.RecipeApi;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import timber.log.Timber;
 
-public class RecipeListActivity extends AppCompatActivity implements Callback<ArrayList<Recipe>> {
-
-    private static final String LOG_TAG = RecipeListActivity.class.getSimpleName();
+public class RecipeListActivity extends AppCompatActivity implements Callback<ArrayList<Recipe>>, RecipeAdapter.OnItemClickListener {
 
     private ArrayList<Recipe> mRecipes;
+    private RecipeAdapter mRecipeAdapter;
+
+    @BindView(R.id.recipe_list)
+    RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
+
+        ButterKnife.bind(this);
+
+        mRecipeAdapter = new RecipeAdapter();
+        mRecipeAdapter.setOnItemClickListener(this);
+        mRecyclerView.setAdapter(mRecipeAdapter);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Controller controller = new Controller();
         Retrofit retrofit = controller.getRetrofit();
@@ -42,9 +57,10 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
         if (response.isSuccessful()) {
             if (response.body() != null) {
                 mRecipes = response.body();
+                mRecipeAdapter.swapList(mRecipes);
 
                 for (Recipe recipe : mRecipes) {
-                    Log.d(LOG_TAG, recipe.name);
+                    Timber.d(recipe.name);
                 }
             }
         }
@@ -53,5 +69,12 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
     @Override
     public void onFailure(@NonNull Call<ArrayList<Recipe>> call, @NonNull Throwable t) {
 
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Recipe recipe = mRecipeAdapter.getItem(position);
+
+        Timber.d("Clicked %s", recipe.name);
     }
 }

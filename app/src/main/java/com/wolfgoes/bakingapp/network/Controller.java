@@ -2,8 +2,10 @@ package com.wolfgoes.bakingapp.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.wolfgoes.bakingapp.BuildConfig;
 
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -18,11 +20,11 @@ public class Controller {
 
         OkHttpClient.Builder okHttpClient = new OkHttpClient().newBuilder();
 
-//        if (BuildConfig.DEBUG) {
-//            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-//            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-//            okHttpClient.addInterceptor(logging);
-//        }
+        if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            okHttpClient.addInterceptor(logging);
+        }
 
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)
