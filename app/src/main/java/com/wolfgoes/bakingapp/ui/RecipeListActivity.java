@@ -3,14 +3,13 @@ package com.wolfgoes.bakingapp.ui;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 
 import com.wolfgoes.bakingapp.R;
 import com.wolfgoes.bakingapp.adapter.RecipeAdapter;
 import com.wolfgoes.bakingapp.model.Recipe;
 import com.wolfgoes.bakingapp.network.Controller;
 import com.wolfgoes.bakingapp.network.api.RecipeApi;
+import com.wolfgoes.bakingapp.view.DynamicSpanRecyclerView;
 
 import java.util.ArrayList;
 
@@ -28,7 +27,7 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
     private RecipeAdapter mRecipeAdapter;
 
     @BindView(R.id.recipe_list)
-    RecyclerView mRecyclerView;
+    DynamicSpanRecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +40,6 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
         mRecipeAdapter.setOnItemClickListener(this);
         mRecyclerView.setAdapter(mRecipeAdapter);
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Controller controller = new Controller();
         Retrofit retrofit = controller.getRetrofit();

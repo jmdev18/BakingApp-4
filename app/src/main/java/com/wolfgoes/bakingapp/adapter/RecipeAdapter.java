@@ -58,7 +58,22 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     @Override
     public RecipeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mContext = parent.getContext();
-        View itemView = LayoutInflater.from(mContext).inflate(R.layout.recipe_item, parent, false);
+        final View itemView = LayoutInflater.from(mContext).inflate(R.layout.recipe_item, parent, false);
+
+        ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
+        if (layoutParams.height == RecyclerView.LayoutParams.WRAP_CONTENT) {
+            int defaultHeight = mContext.getResources().getDimensionPixelSize(R.dimen.recipe_item_height);
+            int defaultWidth = mContext.getResources().getDimensionPixelSize(R.dimen.recipe_item_width);
+
+            int parentWidth = parent.getWidth();
+            int parentMargin = mContext.getResources().getDimensionPixelSize(R.dimen.activity_margin);
+            parentWidth -= (2 * parentMargin);
+
+            float proportion = (float) defaultHeight / (float) defaultWidth;
+            layoutParams.height = (int) (parentWidth * proportion);
+            itemView.setLayoutParams(layoutParams);
+        }
+
         return new RecipeViewHolder(itemView);
     }
 
