@@ -1,5 +1,6 @@
 package com.wolfgoes.bakingapp.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import com.wolfgoes.bakingapp.adapter.RecipeAdapter;
 import com.wolfgoes.bakingapp.model.Recipe;
 import com.wolfgoes.bakingapp.network.Controller;
 import com.wolfgoes.bakingapp.network.api.RecipeApi;
+import com.wolfgoes.bakingapp.util.Constants;
 import com.wolfgoes.bakingapp.view.DynamicSpanRecyclerView;
 
 import java.util.ArrayList;
@@ -30,24 +32,36 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
     DynamicSpanRecyclerView mRecyclerView;
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(Constants.STATE_EXTRA_RECIPES_ARRAY, mRecipes);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
 
         ButterKnife.bind(this);
 
-        mRecipeAdapter = new RecipeAdapter();
+        if (savedInstanceState != null) {
+            mRecipes = savedInstanceState.getParcelableArrayList(Constants.STATE_EXTRA_RECIPES_ARRAY);
+        }
+
+        mRecipeAdapter = new RecipeAdapter(mRecipes);
         mRecipeAdapter.setOnItemClickListener(this);
         mRecyclerView.setAdapter(mRecipeAdapter);
         mRecyclerView.setHasFixedSize(true);
 
-        Controller controller = new Controller();
-        Retrofit retrofit = controller.getRetrofit();
+        if (mRecipes == null) {
+            Controller controller = new Controller();
+            Retrofit retrofit = controller.getRetrofit();
 
-        RecipeApi recipeApi = retrofit.create(RecipeApi.class);
+            RecipeApi recipeApi = retrofit.create(RecipeApi.class);
 
-        Call<ArrayList<Recipe>> call = recipeApi.loadRecipes();
-        call.enqueue(this);
+            Call<ArrayList<Recipe>> call = recipeApi.loadRecipes();
+            call.enqueue(this);
+        }
     }
 
     @Override
@@ -73,6 +87,8 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
     public void onItemClick(int position) {
         Recipe recipe = mRecipeAdapter.getItem(position);
 
-        Timber.d("Clicked %s", recipe.name);
+        Intent intent = new Intent(this, StepsActivity.class);
+        intent.putExtra(Constants.EXTRA_RECIPE, recipe);
+        startActivity(intent);
     }
 }

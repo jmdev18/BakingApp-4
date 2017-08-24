@@ -22,6 +22,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     private OnItemClickListener mOnItemClickListener;
     private ArrayList<Recipe> mRecipes;
 
+    public RecipeAdapter(ArrayList<Recipe> recipes) {
+        mRecipes = recipes;
+    }
+
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
@@ -40,7 +44,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         RecipeViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
+            mRecipeImage.setOnClickListener(this);
         }
 
         @Override
