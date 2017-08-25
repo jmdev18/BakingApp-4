@@ -38,5 +38,7 @@ public class StepDetailActivity extends AppCompatActivity {
                     .add(R.id.step_detail_container, stepDetailFragment)
                     .commit();
         }
+
+        setTitle(mRecipe.name);
     }
 }
