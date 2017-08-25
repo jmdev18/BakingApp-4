@@ -3,4 +3,11 @@
     <string name="ingredients">Ingredients</string>
     <string name="next_button"><![CDATA[Next >]]></string>
     <string name="previous_button"><![CDATA[< Previous]]></string>
+
+    <string name="cup">cup</string>
+    <string name="tablespoon">tablespoon</string>
+    <string name="teaspoon">teaspoon</string>
+    <string name="kilogram">kg</string>
+    <string name="gram">g</string>
+    <string name="ounce">oz</string>
 </resources>

@@ -142,7 +142,7 @@ public class StepDetailFragment extends Fragment {
         mPlayerView.setVisibility(View.GONE);
         String step = "";
         for (Ingredient ingredient : mRecipe.ingredients) {
-            step += ingredient.quantity + " " + ingredient.measure + " " + ingredient.ingredient + "\n";
+            step += ingredient.getString(getContext()) + "\n";
         }
         mStepDescription.setText(step);
     }
