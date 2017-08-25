@@ -18,6 +18,8 @@ import com.wolfgoes.bakingapp.util.Constants;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Optional;
 import timber.log.Timber;
 
 public class StepDetailFragment extends Fragment {
@@ -27,6 +29,22 @@ public class StepDetailFragment extends Fragment {
 
     @BindView(R.id.step_description)
     TextView mStepDescription;
+
+    @Nullable
+    @BindView(R.id.previous_button)
+    View mPreviousButton;
+
+    @Nullable
+    @BindView(R.id.previous_button_text)
+    TextView mPreviousButtonText;
+
+    @Nullable
+    @BindView(R.id.next_button)
+    View mNextButton;
+
+    @Nullable
+    @BindView(R.id.next_button_text)
+    TextView mNextButtonText;
 
     private View mRootView;
     private int mSelected;
@@ -71,17 +89,51 @@ public class StepDetailFragment extends Fragment {
         return mRootView;
     }
 
+    @Optional
+    @OnClick(R.id.previous_button)
+    public void goPrevious() {
+        mSelected--;
+        initView();
+    }
+
+    @Optional
+    @OnClick(R.id.next_button)
+    public void goNext() {
+        mSelected++;
+        initView();
+    }
+
     private void initView() {
         if (mSelected == 0) {
             showIngredients();
         } else {
             showSteps();
         }
+
+        if (!isTablet()) {
+            if (mSelected == 0) {
+                mPreviousButtonText.setEnabled(false);
+                mPreviousButton.setClickable(false);
+            } else {
+                mPreviousButtonText.setEnabled(true);
+                mPreviousButton.setClickable(true);
+            }
+
+            if (mSelected == mRecipe.steps.size() - 1) {
+                mNextButtonText.setEnabled(false);
+                mNextButton.setClickable(false);
+            } else {
+                mNextButtonText.setEnabled(true);
+                mNextButton.setClickable(true);
+            }
+        }
     }
 
     private void showSteps() {
         if (TextUtils.isEmpty(mRecipe.steps.get(mSelected).videoURL)) {
             mPlayerView.setVisibility(View.GONE);
+        } else {
+            mPlayerView.setVisibility(View.VISIBLE);
         }
         mStepDescription.setText(mRecipe.steps.get(mSelected).description);
     }
@@ -101,5 +153,9 @@ public class StepDetailFragment extends Fragment {
 
     public void setRecipe(Recipe recipe) {
         mRecipe = recipe;
+    }
+
+    private boolean isTablet() {
+        return mPreviousButton == null;
     }
 }
