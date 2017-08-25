@@ -37,6 +37,9 @@ public class StepDetailActivity extends AppCompatActivity {
             fragmentManager.beginTransaction()
                     .add(R.id.step_detail_container, stepDetailFragment)
                     .commit();
+        } else {
+            mRecipe = savedInstanceState.getParcelable(Constants.STATE_EXTRA_RECIPE);
+            mSelected = savedInstanceState.getInt(Constants.STATE_EXTRA_POSITION);
         }
 
         setTitle(mRecipe.name);
