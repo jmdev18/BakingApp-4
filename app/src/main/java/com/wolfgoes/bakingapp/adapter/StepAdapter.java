@@ -20,6 +20,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
     private Context mContext;
     private OnItemClickListener mOnItemClickListener;
     private ArrayList<Step> mSteps;
+    private int mSelectedPosition;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
@@ -46,9 +47,11 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
     }
 
     private void itemClick(StepViewHolder holder) {
+        mSelectedPosition = holder.getAdapterPosition();
         if (mOnItemClickListener != null) {
             mOnItemClickListener.onItemClick(holder.getAdapterPosition());
         }
+        notifyDataSetChanged();
     }
 
     @Override
@@ -63,6 +66,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
         Step step = mSteps.get(position);
 
         holder.mStepShortDescription.setText(step.shortDescription);
+        holder.itemView.setSelected(position == mSelectedPosition);
     }
 
     @Override
@@ -73,6 +77,10 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
     public void swapList(ArrayList<Step> steps) {
         mSteps = steps;
         notifyDataSetChanged();
+    }
+
+    public void setSelectedPosition(int position) {
+        mSelectedPosition = position;
     }
 
     public Step getItem(int position) {

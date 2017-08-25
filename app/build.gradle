@@ -37,5 +37,7 @@ dependencies {
     //Interceptor
     compile 'com.squareup.okhttp3:logging-interceptor:3.8.1'
 
+    compile 'com.google.android.exoplayer:exoplayer:r2.2.0'
+
     testCompile 'junit:junit:4.12'
 }

@@ -18,16 +18,22 @@ import com.wolfgoes.bakingapp.util.Constants;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class StepsFragment extends Fragment {
+public class StepsFragment extends Fragment implements StepAdapter.OnItemClickListener {
 
     private Recipe mRecipe;
 
     @BindView(R.id.step_list)
     RecyclerView mRecyclerView;
+    private int mSelected = 0;
+
+    public void setSelected(int selected) {
+        mSelected = selected;
+    }
 
     @Override
     public void onSaveInstanceState(Bundle currentState) {
-        currentState.putParcelable(Constants.EXTRA_RECIPE, mRecipe);
+        currentState.putParcelable(Constants.STATE_EXTRA_RECIPE, mRecipe);
+        currentState.putInt(Constants.STATE_EXTRA_POSITION, mSelected);
     }
 
     @Nullable
@@ -37,7 +43,8 @@ public class StepsFragment extends Fragment {
         ButterKnife.bind(this, rootView);
 
         if (savedInstanceState != null) {
-            mRecipe = savedInstanceState.getParcelable(Constants.EXTRA_RECIPE);
+            mRecipe = savedInstanceState.getParcelable(Constants.STATE_EXTRA_RECIPE);
+            mSelected = savedInstanceState.getInt(Constants.STATE_EXTRA_POSITION);
         } else {
             Step ingredient = new Step();
             ingredient.shortDescription = getString(R.string.ingredients);
@@ -45,8 +52,10 @@ public class StepsFragment extends Fragment {
         }
 
         StepAdapter stepAdapter = new StepAdapter();
+        stepAdapter.setSelectedPosition(mSelected);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(stepAdapter);
+        stepAdapter.setOnItemClickListener(this);
 
         stepAdapter.swapList(mRecipe.steps);
 
@@ -55,5 +64,11 @@ public class StepsFragment extends Fragment {
 
     public void setRecipe(Recipe recipe) {
         mRecipe = recipe;
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        mSelected = position;
+        ((StepsActivity) getActivity()).onItemClick(position);
     }
 }

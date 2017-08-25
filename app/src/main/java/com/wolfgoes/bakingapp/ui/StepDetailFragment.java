@@ -3,18 +3,103 @@ package com.wolfgoes.bakingapp.ui;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.TextView;
 
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.wolfgoes.bakingapp.R;
+import com.wolfgoes.bakingapp.model.Ingredient;
+import com.wolfgoes.bakingapp.model.Recipe;
+import com.wolfgoes.bakingapp.util.Constants;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import timber.log.Timber;
 
 public class StepDetailFragment extends Fragment {
+
+    @BindView(R.id.player_view)
+    SimpleExoPlayerView mPlayerView;
+
+    @BindView(R.id.step_description)
+    TextView mStepDescription;
+
+    private View mRootView;
+    private int mSelected;
+    private Recipe mRecipe;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(Constants.STATE_EXTRA_RECIPE, mRecipe);
+        outState.putInt(Constants.STATE_EXTRA_POSITION, mSelected);
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_step_detail, container, false);
+        mRootView = inflater.inflate(R.layout.fragment_step_detail, container, false);
+
+        ButterKnife.bind(this, mRootView);
+
+        mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                final ViewTreeObserver.OnGlobalLayoutListener thisObserver = this;
+
+                mPlayerView.post(new Runnable() {
+                    public void run() {
+                        Timber.d("mRootView.getWidth() %d", mRootView.getWidth());
+                        mPlayerView.getLayoutParams().height = (int) ((float) mRootView.getWidth() * (9.0 / 16.0));
+                        mPlayerView.requestLayout();
+                        mRootView.getViewTreeObserver().removeGlobalOnLayoutListener(thisObserver);
+                    }
+                });
+            }
+        });
+
+        if (savedInstanceState != null) {
+            mRecipe = savedInstanceState.getParcelable(Constants.STATE_EXTRA_RECIPE);
+            mSelected = savedInstanceState.getInt(Constants.STATE_EXTRA_POSITION);
+        }
+
+        initView();
+
+        return mRootView;
     }
 
+    private void initView() {
+        if (mSelected == 0) {
+            showIngredients();
+        } else {
+            showSteps();
+        }
+    }
+
+    private void showSteps() {
+        if (TextUtils.isEmpty(mRecipe.steps.get(mSelected).videoURL)) {
+            mPlayerView.setVisibility(View.GONE);
+        }
+        mStepDescription.setText(mRecipe.steps.get(mSelected).description);
+    }
+
+    private void showIngredients() {
+        mPlayerView.setVisibility(View.GONE);
+        String step = "";
+        for (Ingredient ingredient : mRecipe.ingredients) {
+            step += ingredient.quantity + " " + ingredient.measure + " " + ingredient.ingredient + "\n";
+        }
+        mStepDescription.setText(step);
+    }
+
+    public void setSelected(int selected) {
+        mSelected = selected;
+    }
+
+    public void setRecipe(Recipe recipe) {
+        mRecipe = recipe;
+    }
 }
