@@ -12,7 +12,8 @@
         android:layout_height="match_parent"
         android:background="@android:color/darker_gray"
         android:clickable="true"
-        android:foreground="?android:attr/selectableItemBackground"/>
+        android:foreground="?android:attr/selectableItemBackground"
+        android:scaleType="centerCrop"/>
 
     <View
         android:id="@+id/backdrop_gradient"

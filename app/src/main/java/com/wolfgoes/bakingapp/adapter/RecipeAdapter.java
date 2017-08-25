@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.wolfgoes.bakingapp.GlideApp;
 import com.wolfgoes.bakingapp.R;
 import com.wolfgoes.bakingapp.model.Recipe;
 
@@ -82,12 +83,15 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     @Override
-    public void onBindViewHolder(RecipeViewHolder holder, int position) {
+    public void onBindViewHolder(final RecipeViewHolder holder, int position) {
         Recipe recipe = mRecipes.get(position);
 
         holder.mRecipeName.setText(recipe.name);
 
-        //TODO: add image with Glide or Picasso
+        GlideApp.with(mContext)
+                .load(recipe.image)
+                .placeholder(R.drawable.default_recipe)
+                .into(holder.mRecipeImage);
     }
 
     @Override
