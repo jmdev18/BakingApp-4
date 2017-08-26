@@ -1,16 +1,18 @@
 package com.wolfgoes.bakingapp.ui;
 
-import android.content.Context;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -22,7 +24,6 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
@@ -41,6 +42,7 @@ public class StepDetailFragment extends Fragment {
     @BindView(R.id.player_view)
     SimpleExoPlayerView mPlayerView;
 
+    @Nullable
     @BindView(R.id.step_description)
     TextView mStepDescription;
 
@@ -59,6 +61,14 @@ public class StepDetailFragment extends Fragment {
     @Nullable
     @BindView(R.id.next_button_text)
     TextView mNextButtonText;
+
+    @Nullable
+    @BindView(R.id.content_view)
+    View mContentView;
+
+    @Nullable
+    @BindView(R.id.button_view)
+    View mButtonView;
 
     private View mRootView;
     private int mSelected;
@@ -93,6 +103,7 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+
         mContainer.removeAllViews();
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -106,9 +117,9 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (!getActivity().isChangingConfigurations()) {
-            releasePlayer();
-        }
+        releasePlayer();
+        mContainer.removeAllViews();
+        mContainer = null;
     }
 
     @Optional
@@ -149,7 +160,7 @@ public class StepDetailFragment extends Fragment {
             showSteps();
         }
 
-        if (!isTablet()) {
+        if (!isTablet() && !isFullscreen()) {
             if (mSelected == 0) {
                 mPreviousButtonText.setEnabled(false);
                 mPreviousButton.setClickable(false);
@@ -174,8 +185,23 @@ public class StepDetailFragment extends Fragment {
         } else {
             mPlayerView.setVisibility(View.VISIBLE);
             initializePlayer(Uri.parse(mRecipe.steps.get(mSelected).videoURL));
+            if (isFullscreen()) {
+                getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+                ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+                actionBar.hide();
+
+                mButtonView.setVisibility(View.GONE);
+                mContentView.setVisibility(View.GONE);
+            }
         }
-        mStepDescription.setText(mRecipe.steps.get(mSelected).description);
+        if (!isFullscreen() || TextUtils.isEmpty(mRecipe.steps.get(mSelected).videoURL)) {
+            ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            actionBar.show();
+
+            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            mStepDescription.setText(mRecipe.steps.get(mSelected).description);
+        }
     }
 
     private void showIngredients() {
@@ -197,6 +223,10 @@ public class StepDetailFragment extends Fragment {
 
     private boolean isTablet() {
         return mPreviousButton == null;
+    }
+
+    private boolean isFullscreen() {
+        return mContentView != null;
     }
 
     private void initializePlayer(Uri mediaUri) {
