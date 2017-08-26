@@ -1,5 +1,8 @@
 package com.wolfgoes.bakingapp.ui;
 
+import android.content.Context;
+import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,7 +13,19 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.LoadControl;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.wolfgoes.bakingapp.R;
 import com.wolfgoes.bakingapp.model.Ingredient;
 import com.wolfgoes.bakingapp.model.Recipe;
@@ -20,7 +35,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Optional;
-import timber.log.Timber;
 
 public class StepDetailFragment extends Fragment {
 
@@ -49,6 +63,8 @@ public class StepDetailFragment extends Fragment {
     private View mRootView;
     private int mSelected;
     private Recipe mRecipe;
+    private SimpleExoPlayer mExoPlayer;
+    private ViewGroup mContainer;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -60,24 +76,9 @@ public class StepDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_step_detail, container, false);
+        mContainer = container;
 
         ButterKnife.bind(this, mRootView);
-
-        mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                final ViewTreeObserver.OnGlobalLayoutListener thisObserver = this;
-
-                mPlayerView.post(new Runnable() {
-                    public void run() {
-                        Timber.d("mRootView.getWidth() %d", mRootView.getWidth());
-                        mPlayerView.getLayoutParams().height = (int) ((float) mRootView.getWidth() * (9.0 / 16.0));
-                        mPlayerView.requestLayout();
-                        mRootView.getViewTreeObserver().removeGlobalOnLayoutListener(thisObserver);
-                    }
-                });
-            }
-        });
 
         if (savedInstanceState != null) {
             mRecipe = savedInstanceState.getParcelable(Constants.STATE_EXTRA_RECIPE);
@@ -89,9 +90,31 @@ public class StepDetailFragment extends Fragment {
         return mRootView;
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mContainer.removeAllViews();
+
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        mRootView = inflater.inflate(R.layout.fragment_step_detail, mContainer);
+
+        ButterKnife.bind(this, mRootView);
+
+        initView();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (!getActivity().isChangingConfigurations()) {
+            releasePlayer();
+        }
+    }
+
     @Optional
     @OnClick(R.id.previous_button)
     public void goPrevious() {
+        releasePlayer();
         mSelected--;
         initView();
     }
@@ -99,11 +122,27 @@ public class StepDetailFragment extends Fragment {
     @Optional
     @OnClick(R.id.next_button)
     public void goNext() {
+        releasePlayer();
         mSelected++;
         initView();
     }
 
     private void initView() {
+        mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                final ViewTreeObserver.OnGlobalLayoutListener thisObserver = this;
+
+                mPlayerView.post(new Runnable() {
+                    public void run() {
+                        mPlayerView.getLayoutParams().height = (int) ((float) mRootView.getWidth() * (9.0 / 16.0));
+                        mPlayerView.requestLayout();
+                        mRootView.getViewTreeObserver().removeGlobalOnLayoutListener(thisObserver);
+                    }
+                });
+            }
+        });
+
         if (mSelected == 0) {
             showIngredients();
         } else {
@@ -134,6 +173,7 @@ public class StepDetailFragment extends Fragment {
             mPlayerView.setVisibility(View.GONE);
         } else {
             mPlayerView.setVisibility(View.VISIBLE);
+            initializePlayer(Uri.parse(mRecipe.steps.get(mSelected).videoURL));
         }
         mStepDescription.setText(mRecipe.steps.get(mSelected).description);
     }
@@ -157,5 +197,33 @@ public class StepDetailFragment extends Fragment {
 
     private boolean isTablet() {
         return mPreviousButton == null;
+    }
+
+    private void initializePlayer(Uri mediaUri) {
+        if (mExoPlayer == null) {
+            // Create an instance of the ExoPlayer.
+            TrackSelector trackSelector = new DefaultTrackSelector();
+            LoadControl loadControl = new DefaultLoadControl();
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
+            mPlayerView.setPlayer(mExoPlayer);
+
+            // Prepare the MediaSource.
+            String userAgent = Util.getUserAgent(getContext(), "Recipe");
+            MediaSource mediaSource = new ExtractorMediaSource(mediaUri,
+                    new DefaultDataSourceFactory(getContext(), userAgent),
+                    new DefaultExtractorsFactory(), null, null);
+            mExoPlayer.prepare(mediaSource);
+            mExoPlayer.setPlayWhenReady(true);
+        } else {
+            mPlayerView.setPlayer(mExoPlayer);
+        }
+    }
+
+    private void releasePlayer() {
+        if (mExoPlayer != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
     }
 }
