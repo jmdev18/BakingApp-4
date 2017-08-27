@@ -51,6 +51,7 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
             if (!TextUtils.isEmpty(mRecipeJson)) {
                 Gson gson = new Gson();
                 Recipe recipe = gson.fromJson(mRecipeJson, Recipe.class);
+                clickIntent.putExtra(Constants.EXTRA_RECIPE, recipe);
 
                 // Set title
                 views.setTextViewText(R.id.widget_title, recipe.name);
