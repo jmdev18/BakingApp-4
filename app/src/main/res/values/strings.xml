@@ -11,4 +11,6 @@
     <string name="gram">g</string>
     <string name="ounce">oz</string>
     <string name="add_recipe_widget">Click here to add a recipe.</string>
+    <string name="loading_recipes">Loading recipes</string>
+    <string name="error_loading_recipes">An error occurred while loading recipes</string>
 </resources>

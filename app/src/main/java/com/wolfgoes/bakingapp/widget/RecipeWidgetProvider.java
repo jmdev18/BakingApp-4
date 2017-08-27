@@ -20,8 +20,6 @@ import com.wolfgoes.bakingapp.ui.RecipeListActivity;
 import com.wolfgoes.bakingapp.ui.StepsActivity;
 import com.wolfgoes.bakingapp.util.Constants;
 
-import timber.log.Timber;
-
 public class RecipeWidgetProvider extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,

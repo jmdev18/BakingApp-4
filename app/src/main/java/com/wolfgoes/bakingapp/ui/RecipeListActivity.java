@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.wolfgoes.bakingapp.R;
@@ -34,10 +36,13 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
     private ArrayList<Recipe> mRecipes;
     private RecipeAdapter mRecipeAdapter;
     private boolean mIsChooseRecipe;
+    private int mWidgetId;
 
     @BindView(R.id.recipe_list)
     DynamicSpanRecyclerView mRecyclerView;
-    private int mWidgetId;
+
+    @BindView(R.id.message_view)
+    TextView mMessageView;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -73,7 +78,11 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
             RecipeApi recipeApi = retrofit.create(RecipeApi.class);
 
             Call<ArrayList<Recipe>> call = recipeApi.loadRecipes();
+            mMessageView.setText(getString(R.string.loading_recipes));
             call.enqueue(this);
+        } else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mMessageView.setVisibility(View.GONE);
         }
     }
 
@@ -81,6 +90,8 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
     public void onResponse(@NonNull Call<ArrayList<Recipe>> call, @NonNull Response<ArrayList<Recipe>> response) {
         if (response.isSuccessful()) {
             if (response.body() != null) {
+                mRecyclerView.setVisibility(View.VISIBLE);
+                mMessageView.setVisibility(View.GONE);
                 mRecipes = response.body();
                 mRecipeAdapter.swapList(mRecipes);
 
@@ -88,12 +99,18 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
                     Timber.d(recipe.name);
                 }
             }
+        } else {
+            mMessageView.setText(getString(R.string.error_loading_recipes));
+            mRecyclerView.setVisibility(View.GONE);
+            mMessageView.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void onFailure(@NonNull Call<ArrayList<Recipe>> call, @NonNull Throwable t) {
-
+        mMessageView.setText(getString(R.string.error_loading_recipes));
+        mRecyclerView.setVisibility(View.GONE);
+        mMessageView.setVisibility(View.VISIBLE);
     }
 
     @Override
