@@ -1,10 +1,15 @@
 package com.wolfgoes.bakingapp.ui;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.gson.Gson;
 import com.wolfgoes.bakingapp.R;
 import com.wolfgoes.bakingapp.adapter.RecipeAdapter;
 import com.wolfgoes.bakingapp.model.Recipe;
@@ -12,6 +17,7 @@ import com.wolfgoes.bakingapp.network.Controller;
 import com.wolfgoes.bakingapp.network.api.RecipeApi;
 import com.wolfgoes.bakingapp.util.Constants;
 import com.wolfgoes.bakingapp.view.DynamicSpanRecyclerView;
+import com.wolfgoes.bakingapp.widget.RecipeWidgetProvider;
 
 import java.util.ArrayList;
 
@@ -27,13 +33,16 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
 
     private ArrayList<Recipe> mRecipes;
     private RecipeAdapter mRecipeAdapter;
+    private boolean mIsChooseRecipe;
 
     @BindView(R.id.recipe_list)
     DynamicSpanRecyclerView mRecyclerView;
+    private int mWidgetId;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList(Constants.STATE_EXTRA_RECIPES_ARRAY, mRecipes);
+        outState.putBoolean(Constants.STATE_EXTRA_CHOOSE_RECIPE, mIsChooseRecipe);
         super.onSaveInstanceState(outState);
     }
 
@@ -42,10 +51,14 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
 
+        mIsChooseRecipe = getIntent().getBooleanExtra(Constants.EXTRA_CHOOSE_RECIPE, false);
+        mWidgetId = getIntent().getIntExtra(Constants.EXTRA_WIDGET_ID, 0);
+
         ButterKnife.bind(this);
 
         if (savedInstanceState != null) {
             mRecipes = savedInstanceState.getParcelableArrayList(Constants.STATE_EXTRA_RECIPES_ARRAY);
+            mIsChooseRecipe = savedInstanceState.getBoolean(Constants.STATE_EXTRA_CHOOSE_RECIPE, false);
         }
 
         mRecipeAdapter = new RecipeAdapter(mRecipes);
@@ -87,8 +100,26 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
     public void onItemClick(int position) {
         Recipe recipe = mRecipeAdapter.getItem(position);
 
-        Intent intent = new Intent(this, StepsActivity.class);
-        intent.putExtra(Constants.EXTRA_RECIPE, recipe);
-        startActivity(intent);
+        if (mIsChooseRecipe) {
+            mIsChooseRecipe = false;
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            Gson gson = new Gson();
+            editor.putString(Integer.toString(mWidgetId), gson.toJson(recipe));
+            editor.commit();
+
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, RecipeWidgetProvider.class));
+            RecipeWidgetProvider.updateRecipeWidgets(this, appWidgetManager, appWidgetIds);
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_content_list);
+
+            finish();
+        } else {
+            Intent intent = new Intent(this, StepsActivity.class);
+            intent.putExtra(Constants.EXTRA_RECIPE, recipe);
+            startActivity(intent);
+        }
     }
 }

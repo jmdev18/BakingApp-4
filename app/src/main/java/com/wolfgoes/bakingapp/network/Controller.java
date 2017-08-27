@@ -23,7 +23,7 @@ public class Controller {
         if (BuildConfig.DEBUG) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-            okHttpClient.addInterceptor(logging);
+//            okHttpClient.addInterceptor(logging);
         }
 
         return new Retrofit.Builder()

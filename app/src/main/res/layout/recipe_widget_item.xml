@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/recipe_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        tools:text="1 cup bread crumbs\n1/2 teaspoon garlic powder\n1/2 teaspoon dried thyme\n1/4 cup Dijon mustard\n1/3 cup light mayonnaise\n1 1/2 pounds chicken tenders, cut into 1-inch pieces\n3/4 pound green beans, washed, trimmed and steamed\n"/>
+</LinearLayout>
