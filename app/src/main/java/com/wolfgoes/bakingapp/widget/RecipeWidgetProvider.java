@@ -155,8 +155,6 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
                     for (Ingredient ingredient : recipe.ingredients) {
                         content += ingredient.getString(mContext) + "\n";
                     }
-
-                    fillInIntent.putExtra(Constants.EXTRA_RECIPE, recipe);
                 }
 
                 RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.recipe_widget_item);

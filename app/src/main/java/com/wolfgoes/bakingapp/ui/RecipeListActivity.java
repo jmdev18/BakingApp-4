@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -171,7 +172,11 @@ public class RecipeListActivity extends AppCompatActivity implements Callback<Ar
             RecipeWidgetProvider.updateRecipeWidgets(this, appWidgetManager, appWidgetIds);
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_content_list);
 
-            finish();
+            if (Build.VERSION.SDK_INT >= 21) {
+                finishAndRemoveTask();
+            } else {
+                finish();
+            }
         } else {
             Intent intent = new Intent(this, StepsActivity.class);
             intent.putExtra(Constants.EXTRA_RECIPE, recipe);
