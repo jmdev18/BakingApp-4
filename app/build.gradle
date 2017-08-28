@@ -19,33 +19,50 @@ android {
     }
 }
 
+ext {
+    supportLibVersion = '25.3.1'
+    espressoLibVersion = '2.2.2'
+    glideLibVersion = '4.0.0'
+    butterKnifeLibVersion = '8.8.1'
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile("com.android.support:appcompat-v7:${supportLibVersion}")
+    compile("com.android.support:recyclerview-v7:${supportLibVersion}")
+    compile("com.android.support:support-v4:${supportLibVersion}")
+    compile "com.squareup.retrofit2:converter-gson:2.3.0"
+    compile "com.squareup.retrofit2:retrofit:2.3.0"
 
-    compile 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    compile("com.jakewharton:butterknife:${butterKnifeLibVersion}")
+    annotationProcessor("com.jakewharton:butterknife-compiler:${butterKnifeLibVersion}")
 
-    compile 'com.jakewharton.timber:timber:4.5.1'
+    compile "com.jakewharton.timber:timber:4.5.1"
 
-    compile 'com.github.bumptech.glide:glide:4.0.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
+    compile("com.github.bumptech.glide:glide:${glideLibVersion}")
+    annotationProcessor("com.github.bumptech.glide:compiler:${glideLibVersion}")
 
     //Interceptor
-    compile 'com.squareup.okhttp3:logging-interceptor:3.8.1'
+    compile "com.squareup.okhttp3:logging-interceptor:3.8.1"
 
-    compile 'com.google.android.exoplayer:exoplayer:r2.2.0'
+    compile "com.google.android.exoplayer:exoplayer:r2.2.0"
 
-    compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
+    compile("com.android.support.test.espresso:espresso-idling-resource:${espressoLibVersion}")
 
-    androidTestCompile 'com.android.support:support-annotations:25.3.1'
+    androidTestCompile("com.android.support:support-annotations:${supportLibVersion}")
 
     // AndroidJUnitRunner and JUnit Rules
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-    androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
+    androidTestCompile("com.android.support.test.espresso:espresso-core:${espressoLibVersion}")
+    androidTestCompile("com.android.support.test.espresso:espresso-intents:${espressoLibVersion}")
+
+    androidTestCompile("com.android.support.test.espresso:espresso-contrib:${espressoLibVersion}") {
+        // Necessary to avoid version conflicts
+        exclude module: 'espresso-core'
+        exclude module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'appcompat-v7'
+        exclude module: 'support-annotations'
+        exclude module: 'design'
+    }
 }

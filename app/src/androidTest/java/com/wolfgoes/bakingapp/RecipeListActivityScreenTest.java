@@ -2,6 +2,7 @@ package com.wolfgoes.bakingapp;
 
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingResource;
+import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -41,7 +42,7 @@ public class RecipeListActivityScreenTest {
 
     @Test
     public void clickGridViewItem_OpensStepsActivity() throws Exception {
-        onView(allOf(withId(R.id.recipe_name), withText("Nutella Pie"))).perform(click());
+        onView(withId(R.id.recipe_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
         intended(hasExtraWithKey(Constants.EXTRA_RECIPE));
     }
