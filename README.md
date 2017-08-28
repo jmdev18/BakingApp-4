@@ -13,3 +13,4 @@ This is the second project from the Udacity's Android Nanodegree, which fetch so
 * [Timber](https://github.com/JakeWharton/timber)
 * [ExoPlayer](https://github.com/google/ExoPlayer)
 * [ButterKnife](https://github.com/JakeWharton/butterknife)
+* [gradle-versions-plugin](https://github.com/ben-manes/gradle-versions-plugin)
