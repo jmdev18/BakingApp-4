@@ -1,6 +1,7 @@
 package com.wolfgoes.bakingapp.ui;
 
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,8 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
@@ -27,6 +33,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.wolfgoes.bakingapp.GlideApp;
 import com.wolfgoes.bakingapp.R;
 import com.wolfgoes.bakingapp.model.Ingredient;
 import com.wolfgoes.bakingapp.model.Recipe;
@@ -69,6 +76,10 @@ public class StepDetailFragment extends Fragment {
     @Nullable
     @BindView(R.id.button_view)
     View mButtonView;
+
+    @Nullable
+    @BindView(R.id.thumbnail)
+    ImageView mThumbailView;
 
     private View mRootView;
     private int mSelected;
@@ -201,6 +212,29 @@ public class StepDetailFragment extends Fragment {
 
             getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             mStepDescription.setText(mRecipe.steps.get(mSelected).description);
+        }
+
+        if (!isFullscreen()) {
+            GlideApp.with(getContext())
+                    .load(mRecipe.steps.get(mSelected).thumbnailURL)
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object o, Target<Drawable> target, boolean b) {
+                            if (mThumbailView != null) {
+                                mThumbailView.setVisibility(View.GONE);
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable drawable, Object o, Target<Drawable> target, DataSource dataSource, boolean b) {
+                            if (mThumbailView != null) {
+                                mThumbailView.setImageDrawable(drawable);
+                                mThumbailView.setVisibility(View.VISIBLE);
+                            }
+                            return true;
+                        }
+                    });
         }
     }
 

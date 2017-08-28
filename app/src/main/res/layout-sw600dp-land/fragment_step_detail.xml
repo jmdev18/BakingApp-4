@@ -19,13 +19,31 @@
         android:layout_marginRight="@dimen/activity_margin"
         android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/step_description"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textAlignment="center"
-            tools:text="12. Cover the cheesecake with plastic wrap, not allowing the plastic to touch the top of the cake, and refrigerate it for at least 8 hours. Then it's ready to serve!"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/step_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                tools:text="12. Cover the cheesecake with plastic wrap, not allowing the plastic to touch the top of the cake, and refrigerate it for at least 8 hours. Then it's ready to serve!"/>
+
+            <ImageView
+                android:id="@+id/thumbnail"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/thumbnail_height"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/thumbnail_margin"
+                android:visibility="gone"
+                tools:src="@drawable/default_recipe"
+                tools:visibility="visible"/>
+
+        </LinearLayout>
 
     </ScrollView>
 </LinearLayout>
