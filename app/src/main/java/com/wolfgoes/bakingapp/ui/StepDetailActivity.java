@@ -3,6 +3,7 @@ package com.wolfgoes.bakingapp.ui;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 
 import com.wolfgoes.bakingapp.R;
 import com.wolfgoes.bakingapp.model.Recipe;
@@ -25,6 +26,10 @@ public class StepDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_detail);
 
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         if (savedInstanceState == null) {
             mRecipe = getIntent().getParcelableExtra(Constants.EXTRA_RECIPE);
             mSelected = getIntent().getIntExtra(Constants.EXTRA_POSITION, 0);
@@ -43,5 +48,15 @@ public class StepDetailActivity extends AppCompatActivity {
         }
 
         setTitle(mRecipe.name);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

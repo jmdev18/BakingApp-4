@@ -22,11 +22,21 @@
 
         <activity
             android:name=".ui.StepsActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".ui.RecipeListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.StepsActivity"/>
+        </activity>
 
         <activity
             android:name=".ui.StepDetailActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".ui.StepsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.StepsActivity"/>
+        </activity>
 
         <receiver android:name=".widget.RecipeWidgetProvider">
             <intent-filter>
@@ -40,7 +50,7 @@
 
         <service
             android:name=".widget.RecipeWidgetProvider$ListWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
 
     </application>
 
