@@ -2,9 +2,9 @@
 This is the second project from the Udacity's Android Nanodegree, which fetch some recipes and exhibits them awesomely, and also provides an unique widget.
 
 # Screenshots
-![screen](../master/readme_images/1.png) ![screen](../master/readme_images/2.png)
+![screen](../master/readme_images/1.png) ![screen](../master/readme_images/2.png) ![screen](../master/readme_images/3.png) 
 
-![screen](../master/readme_images/3.png) ![screen](../master/readme_images/4.png)
+![screen](../master/readme_images/4.png) ![screen](../master/readme_images/5.png) 
 
 # Libraries
 * [Retrofit2](https://github.com/square/retrofit)
@@ -13,4 +13,3 @@ This is the second project from the Udacity's Android Nanodegree, which fetch so
 * [Timber](https://github.com/JakeWharton/timber)
 * [ExoPlayer](https://github.com/google/ExoPlayer)
 * [ButterKnife](https://github.com/JakeWharton/butterknife)
-* [gradle-versions-plugin](https://github.com/ben-manes/gradle-versions-plugin)
